@@ -1,0 +1,171 @@
+type ClaimVault_JackpotClaimed {
+  id: ID!
+  claimer: String!
+  nonce: BigInt!
+  amount: BigInt!
+}
+
+type ClaimVault_OwnershipHandoverCanceled {
+  id: ID!
+  pendingOwner: String!
+}
+
+type ClaimVault_OwnershipHandoverRequested {
+  id: ID!
+  pendingOwner: String!
+}
+
+type ClaimVault_OwnershipTransferred {
+  id: ID!
+  oldOwner: String!
+  newOwner: String!
+}
+
+type ClaimVault_PauseStatusChanged {
+  id: ID!
+  paused: Boolean!
+}
+
+type ClaimVault_SignerUpdated {
+  id: ID!
+  oldSigner: String!
+  newSigner: String!
+}
+
+type ClaimVault_Upgraded {
+  id: ID!
+  implementation: String!
+}
+
+type ClaimVault_WeeklyClaimed {
+  id: ID!
+  claimer: String!
+  week: BigInt!
+  amount: BigInt!
+}
+
+type KeyPurchase_ClaimsRecipientUpdated {
+  id: ID!
+  oldClaimsRecipient: String!
+  newClaimsRecipient: String!
+}
+
+type KeyPurchase_FeeBpsUpdated {
+  id: ID!
+  oldFeeBps: BigInt!
+  newFeeBps: BigInt!
+}
+
+type KeyPurchase_FeeRecipientUpdated {
+  id: ID!
+  oldFeeRecipient: String!
+  newFeeRecipient: String!
+}
+
+type KeyPurchase_KeyPriceUpdated {
+  id: ID!
+  oldPrice: BigInt!
+  newPrice: BigInt!
+}
+
+type KeyPurchase_KeysPurchased {
+  id: ID!
+  buyer: String!
+  quantity: BigInt!
+  pricePerKey: BigInt!
+  totalPaid: BigInt!
+}
+
+type KeyPurchase_OwnershipHandoverCanceled {
+  id: ID!
+  pendingOwner: String!
+}
+
+type KeyPurchase_OwnershipHandoverRequested {
+  id: ID!
+  pendingOwner: String!
+}
+
+type KeyPurchase_OwnershipTransferred {
+  id: ID!
+  oldOwner: String!
+  newOwner: String!
+}
+
+type KeyPurchase_PauseStatusChanged {
+  id: ID!
+  paused: Boolean!
+}
+
+type KeyPurchase_Upgraded {
+  id: ID!
+  implementation: String!
+}
+
+type GlobalStats {
+  id: ID!
+  totalUniquePlayers: BigInt!
+  keyPurchaseEvents: BigInt!
+  keysPurchased: BigInt!
+  keyPurchaseAmount: BigInt!
+  weeklyClaimEvents: BigInt!
+  weeklyClaimAmount: BigInt!
+  jackpotClaimEvents: BigInt!
+  jackpotClaimAmount: BigInt!
+  updatedAtBlock: BigInt!
+  updatedAtTimestamp: BigInt!
+}
+
+type PlayerStats {
+  id: ID!
+  wallet: String!
+  firstSeenBlock: BigInt!
+  firstSeenTimestamp: BigInt!
+  updatedAtBlock: BigInt!
+  updatedAtTimestamp: BigInt!
+  keyPurchaseEvents: BigInt!
+  keysPurchased: BigInt!
+  keyPurchaseAmount: BigInt!
+  weeklyClaimEvents: BigInt!
+  weeklyClaimAmount: BigInt!
+  jackpotClaimEvents: BigInt!
+  jackpotClaimAmount: BigInt!
+}
+
+type WeeklyStats {
+  id: ID!
+  week: BigInt!
+  weeklyClaimEvents: BigInt!
+  weeklyClaimAmount: BigInt!
+  uniqueClaimers: BigInt!
+  updatedAtBlock: BigInt!
+  updatedAtTimestamp: BigInt!
+}
+
+type PlayerWeeklyStats {
+  id: ID!
+  wallet: String!
+  week: BigInt!
+  weeklyClaimEvents: BigInt!
+  weeklyClaimAmount: BigInt!
+  firstClaimBlock: BigInt!
+  firstClaimTimestamp: BigInt!
+  lastClaimBlock: BigInt!
+  lastClaimTimestamp: BigInt!
+}
+
+type JackpotStats {
+  id: ID!
+  nonce: BigInt!
+  jackpotClaimEvents: BigInt!
+  jackpotClaimAmount: BigInt!
+  uniqueClaimers: BigInt!
+  updatedAtBlock: BigInt!
+  updatedAtTimestamp: BigInt!
+}
+
+type JackpotPlayerSeen {
+  id: ID!
+  nonce: BigInt!
+  wallet: String!
+}

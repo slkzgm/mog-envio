@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=./node_modules/envio/evm.schema.json
+name: mog-indexer
+networks:
+- id: 2741
+  start_block: 38280364
+  contracts:
+  - name: ClaimVault
+    address:
+    - 0x40018Cbb1926dae72DCb315E89AAB7320A191D02
+    handler: src/EventHandlers.ts
+    events:
+    - event: JackpotClaimed(address indexed claimer, uint256 indexed nonce, uint256 amount)
+    - event: OwnershipHandoverCanceled(address indexed pendingOwner)
+    - event: OwnershipHandoverRequested(address indexed pendingOwner)
+    - event: OwnershipTransferred(address indexed oldOwner, address indexed newOwner)
+    - event: PauseStatusChanged(bool paused)
+    - event: SignerUpdated(address oldSigner, address newSigner)
+    - event: Upgraded(address indexed implementation)
+    - event: WeeklyClaimed(address indexed claimer, uint256 indexed week, uint256 amount)
+  - name: KeyPurchase
+    address:
+    - 0xBDE2483b242C266a97E39826b2B5B3c06FC02916
+    handler: src/EventHandlers.ts
+    events:
+    - event: ClaimsRecipientUpdated(address oldClaimsRecipient, address newClaimsRecipient)
+    - event: FeeBpsUpdated(uint256 oldFeeBps, uint256 newFeeBps)
+    - event: FeeRecipientUpdated(address oldFeeRecipient, address newFeeRecipient)
+    - event: KeyPriceUpdated(uint256 oldPrice, uint256 newPrice)
+    - event: KeysPurchased(address indexed buyer, uint256 quantity, uint256 pricePerKey, uint256 totalPaid)
+    - event: OwnershipHandoverCanceled(address indexed pendingOwner)
+    - event: OwnershipHandoverRequested(address indexed pendingOwner)
+    - event: OwnershipTransferred(address indexed oldOwner, address indexed newOwner)
+    - event: PauseStatusChanged(bool paused)
+    - event: Upgraded(address indexed implementation)
+unordered_multichain_mode: true
+preload_handlers: true
