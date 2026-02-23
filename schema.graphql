@@ -112,6 +112,8 @@ type GlobalStats {
   weeklyClaimAmount: BigInt!
   jackpotClaimEvents: BigInt!
   jackpotClaimAmount: BigInt!
+  totalClaimAmount: BigInt!
+  netProfitAmount: BigInt!
   updatedAtBlock: BigInt!
   updatedAtTimestamp: BigInt!
 }
@@ -130,6 +132,8 @@ type PlayerStats {
   weeklyClaimAmount: BigInt!
   jackpotClaimEvents: BigInt!
   jackpotClaimAmount: BigInt!
+  totalClaimAmount: BigInt!
+  netProfitAmount: BigInt!
 }
 
 type WeeklyStats {

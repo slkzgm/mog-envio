@@ -41,6 +41,8 @@ query GlobalOverview {
     weeklyClaimAmount
     jackpotClaimEvents
     jackpotClaimAmount
+    totalClaimAmount
+    netProfitAmount
   }
 }
 ```
@@ -56,6 +58,8 @@ query WalletOverview($wallet: String!) {
     weeklyClaimAmount
     jackpotClaimEvents
     jackpotClaimAmount
+    totalClaimAmount
+    netProfitAmount
   }
 }
 ```

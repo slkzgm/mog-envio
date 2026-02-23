@@ -59,6 +59,8 @@ const makeGlobalStats = (block: BlockMeta): GlobalStats => ({
   weeklyClaimAmount: ZERO,
   jackpotClaimEvents: ZERO,
   jackpotClaimAmount: ZERO,
+  totalClaimAmount: ZERO,
+  netProfitAmount: ZERO,
   updatedAtBlock: asBigInt(block.number),
   updatedAtTimestamp: asBigInt(block.timestamp),
 });
@@ -77,6 +79,8 @@ const makePlayerStats = (wallet: string, block: BlockMeta): PlayerStats => ({
   weeklyClaimAmount: ZERO,
   jackpotClaimEvents: ZERO,
   jackpotClaimAmount: ZERO,
+  totalClaimAmount: ZERO,
+  netProfitAmount: ZERO,
 });
 
 const makeWeeklyStats = (week: bigint, block: BlockMeta): WeeklyStats => ({
@@ -174,6 +178,8 @@ ClaimVault.JackpotClaimed.handler(async ({ event, context }) => {
     totalUniquePlayers: globalStats.totalUniquePlayers + (isNewPlayer ? 1n : ZERO),
     jackpotClaimEvents: globalStats.jackpotClaimEvents + 1n,
     jackpotClaimAmount: globalStats.jackpotClaimAmount + event.params.amount,
+    totalClaimAmount: globalStats.totalClaimAmount + event.params.amount,
+    netProfitAmount: globalStats.netProfitAmount + event.params.amount,
     updatedAtBlock: asBigInt(event.block.number),
     updatedAtTimestamp: asBigInt(event.block.timestamp),
   };
@@ -182,6 +188,8 @@ ClaimVault.JackpotClaimed.handler(async ({ event, context }) => {
     ...playerStats,
     jackpotClaimEvents: playerStats.jackpotClaimEvents + 1n,
     jackpotClaimAmount: playerStats.jackpotClaimAmount + event.params.amount,
+    totalClaimAmount: playerStats.totalClaimAmount + event.params.amount,
+    netProfitAmount: playerStats.netProfitAmount + event.params.amount,
     updatedAtBlock: asBigInt(event.block.number),
     updatedAtTimestamp: asBigInt(event.block.timestamp),
   };
@@ -297,6 +305,8 @@ ClaimVault.WeeklyClaimed.handler(async ({ event, context }) => {
     totalUniquePlayers: globalStats.totalUniquePlayers + (isNewPlayer ? 1n : ZERO),
     weeklyClaimEvents: globalStats.weeklyClaimEvents + 1n,
     weeklyClaimAmount: globalStats.weeklyClaimAmount + event.params.amount,
+    totalClaimAmount: globalStats.totalClaimAmount + event.params.amount,
+    netProfitAmount: globalStats.netProfitAmount + event.params.amount,
     updatedAtBlock: asBigInt(event.block.number),
     updatedAtTimestamp: asBigInt(event.block.timestamp),
   };
@@ -305,6 +315,8 @@ ClaimVault.WeeklyClaimed.handler(async ({ event, context }) => {
     ...playerStats,
     weeklyClaimEvents: playerStats.weeklyClaimEvents + 1n,
     weeklyClaimAmount: playerStats.weeklyClaimAmount + event.params.amount,
+    totalClaimAmount: playerStats.totalClaimAmount + event.params.amount,
+    netProfitAmount: playerStats.netProfitAmount + event.params.amount,
     updatedAtBlock: asBigInt(event.block.number),
     updatedAtTimestamp: asBigInt(event.block.timestamp),
   };
@@ -388,6 +400,7 @@ KeyPurchase.KeysPurchased.handler(async ({ event, context }) => {
     keyPurchaseEvents: globalStats.keyPurchaseEvents + 1n,
     keysPurchased: globalStats.keysPurchased + event.params.quantity,
     keyPurchaseAmount: globalStats.keyPurchaseAmount + event.params.totalPaid,
+    netProfitAmount: globalStats.netProfitAmount - event.params.totalPaid,
     updatedAtBlock: asBigInt(event.block.number),
     updatedAtTimestamp: asBigInt(event.block.timestamp),
   };
@@ -397,6 +410,7 @@ KeyPurchase.KeysPurchased.handler(async ({ event, context }) => {
     keyPurchaseEvents: playerStats.keyPurchaseEvents + 1n,
     keysPurchased: playerStats.keysPurchased + event.params.quantity,
     keyPurchaseAmount: playerStats.keyPurchaseAmount + event.params.totalPaid,
+    netProfitAmount: playerStats.netProfitAmount - event.params.totalPaid,
     updatedAtBlock: asBigInt(event.block.number),
     updatedAtTimestamp: asBigInt(event.block.timestamp),
   };
