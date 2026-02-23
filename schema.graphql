@@ -121,6 +121,11 @@ type GlobalStats {
 type PlayerStats {
   id: ID!
   wallet: String!
+  profileName: String
+  profileImageUrl: String
+  profileVerification: String
+  profileFetchAttempted: Boolean!
+  profileFetchedAtTimestamp: BigInt
   firstSeenBlock: BigInt!
   firstSeenTimestamp: BigInt!
   updatedAtBlock: BigInt!

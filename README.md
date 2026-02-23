@@ -51,6 +51,10 @@ query GlobalOverview {
 query WalletOverview($wallet: String!) {
   PlayerStats(where: { wallet: { _eq: $wallet } }) {
     wallet
+    profileName
+    profileImageUrl
+    profileVerification
+    profileFetchAttempted
     keyPurchaseEvents
     keysPurchased
     keyPurchaseAmount
@@ -63,6 +67,14 @@ query WalletOverview($wallet: String!) {
   }
 }
 ```
+
+`PlayerStats` profile fields are populated once on first wallet creation via:
+
+- `GET https://backend.portal.abs.xyz/api/user/address/{wallet}`
+
+Optional environment variable:
+
+- `ABS_PROFILE_BEARER` (only if Abstract API requires bearer in your environment)
 
 ```graphql
 query WeeklyOverview($week: BigInt!) {

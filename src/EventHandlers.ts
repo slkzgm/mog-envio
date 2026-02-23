@@ -1,6 +1,7 @@
 /*
  * Please refer to https://docs.envio.dev for a thorough guide on all Envio indexer features
  */
+import { S, createEffect } from "envio";
 import {
   ClaimVault,
   ClaimVault_JackpotClaimed,
@@ -32,10 +33,21 @@ import {
 
 const GLOBAL_STATS_ID = "global";
 const ZERO = 0n;
+const ABS_PROFILE_BY_WALLET_ENDPOINT = "https://backend.portal.abs.xyz/api/user/address";
+const ABS_PROFILE_BEARER = process.env.ABS_PROFILE_BEARER ?? "";
+const ABS_PROFILE_USER_AGENT =
+  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36";
 
 type BlockMeta = {
   number: number;
   timestamp: number;
+};
+
+type AbsProfile = {
+  found: boolean;
+  name: string;
+  imageUrl: string;
+  verification: string;
 };
 
 const asBigInt = (value: number): bigint => BigInt(value);
@@ -48,6 +60,92 @@ const normalizeWallet = (wallet: string): string => wallet.toLowerCase();
 const playerWeeklyId = (wallet: string, week: bigint): string => `${wallet}_${week.toString()}`;
 const jackpotId = (nonce: bigint): string => nonce.toString();
 const jackpotPlayerSeenId = (nonce: bigint, wallet: string): string => `${nonce.toString()}_${wallet}`;
+const asTrimmedString = (value: unknown): string => (typeof value === "string" ? value.trim() : "");
+const asPositiveInteger = (value: unknown): number | null => {
+  if (typeof value !== "number" || !Number.isInteger(value) || value <= 0) return null;
+  return value;
+};
+
+const resolveAvatarUrl = (user: any): string => {
+  const override = asTrimmedString(user?.overrideProfilePictureUrl);
+  if (override) return override;
+
+  const season = asPositiveInteger(user?.avatar?.season);
+  const tier = asPositiveInteger(user?.avatar?.tier);
+  const key = asPositiveInteger(user?.avatar?.key);
+
+  if (season && tier && key) {
+    return `https://abstract-assets.abs.xyz/avatars/${season}-${tier}-${key}.png`;
+  }
+
+  return "";
+};
+
+const EMPTY_ABS_PROFILE: AbsProfile = {
+  found: false,
+  name: "",
+  imageUrl: "",
+  verification: "",
+};
+
+const absProfileEffect = createEffect(
+  {
+    name: "abs-profile-by-wallet",
+    input: { wallet: S.string },
+    output: {
+      found: S.boolean,
+      name: S.string,
+      imageUrl: S.string,
+      verification: S.string,
+    },
+    rateLimit: { calls: 10, per: "second" },
+    cache: true,
+  },
+  async ({ input, context }): Promise<AbsProfile> => {
+    const headers: Record<string, string> = {
+      Accept: "application/json, text/plain, */*",
+      "User-Agent": ABS_PROFILE_USER_AGENT,
+      Referer: "https://portal.abs.xyz/",
+    };
+    if (ABS_PROFILE_BEARER) {
+      headers.Authorization = `Bearer ${ABS_PROFILE_BEARER}`;
+    }
+
+    try {
+      const response = await fetch(`${ABS_PROFILE_BY_WALLET_ENDPOINT}/${input.wallet}`, {
+        method: "GET",
+        headers,
+      });
+
+      if (!response.ok) {
+        if (response.status >= 500 || response.status === 429) {
+          context.cache = false;
+        }
+        return EMPTY_ABS_PROFILE;
+      }
+
+      const payload = (await response.json()) as any;
+      const user = payload?.user;
+      if (!user || typeof user !== "object") return EMPTY_ABS_PROFILE;
+
+      const name = asTrimmedString(user.name);
+      const imageUrl = resolveAvatarUrl(user);
+      const verification = asTrimmedString(user.verification);
+
+      if (!name && !imageUrl) return EMPTY_ABS_PROFILE;
+
+      return {
+        found: true,
+        name,
+        imageUrl,
+        verification,
+      };
+    } catch {
+      context.cache = false;
+      return EMPTY_ABS_PROFILE;
+    }
+  }
+);
 
 const makeGlobalStats = (block: BlockMeta): GlobalStats => ({
   id: GLOBAL_STATS_ID,
@@ -68,6 +166,11 @@ const makeGlobalStats = (block: BlockMeta): GlobalStats => ({
 const makePlayerStats = (wallet: string, block: BlockMeta): PlayerStats => ({
   id: wallet,
   wallet,
+  profileName: undefined,
+  profileImageUrl: undefined,
+  profileVerification: undefined,
+  profileFetchAttempted: false,
+  profileFetchedAtTimestamp: undefined,
   firstSeenBlock: asBigInt(block.number),
   firstSeenTimestamp: asBigInt(block.timestamp),
   updatedAtBlock: asBigInt(block.number),
@@ -139,7 +242,20 @@ const getOrCreatePlayerStats = async (
     return { playerStats: existing, isNewPlayer: false };
   }
 
-  return { playerStats: makePlayerStats(wallet, block), isNewPlayer: true };
+  const createdPlayerStats = makePlayerStats(wallet, block);
+  const profile = await context.effect(absProfileEffect, { wallet });
+
+  return {
+    playerStats: {
+      ...createdPlayerStats,
+      profileName: profile.name || undefined,
+      profileImageUrl: profile.imageUrl || undefined,
+      profileVerification: profile.verification || undefined,
+      profileFetchAttempted: true,
+      profileFetchedAtTimestamp: asBigInt(block.timestamp),
+    },
+    isNewPlayer: true,
+  };
 };
 
 const getOrCreateWeeklyStats = async (context: any, week: bigint, block: BlockMeta): Promise<WeeklyStats> =>
