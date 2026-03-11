@@ -9,7 +9,11 @@
     "codegen": "envio codegen",
     "dev": "envio dev",
     "start": "envio start",
-    "test": "pnpm mocha"
+    "test": "pnpm mocha",
+    "setup-public": "node scripts/hasura/setup-public-tables.js",
+    "docker:up": "docker compose up -d --build",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
   },
   "devDependencies": {
     "@types/chai": "^4.3.11",    
